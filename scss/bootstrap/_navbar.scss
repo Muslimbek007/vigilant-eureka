@@ -1,0 +1,1040 @@
+// Contents
+//
+// Navbar
+// Navbar brand
+// Navbar nav
+// Navbar text
+// Navbar divider
+// Responsive navbar
+// Navbar position
+// Navbar themes
+
+
+// Navbar
+//
+// Provide a static navbar from which we expand to create full-width, fixed, and
+// other navbar variations.
+
+.navbar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap; // allow us to do the line break for collapsing content
+  align-items: center;
+  justify-content: space-between; // space out brand from logo
+  padding: $navbar-padding-y $navbar-padding-x;
+
+  // Because flex properties aren't inherited, we need to redeclare these first
+  // few properties so that content nested within behave properly.
+  %container-flex-properties {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .container,
+  .container-fluid {
+    @extend %container-flex-properties;
+  }
+
+  @each $breakpoint, $container-max-width in $container-max-widths {
+    > .container#{breakpoint-infix($breakpoint, $container-max-widths)} {
+      @extend %container-flex-properties;
+    }
+  }
+}
+
+
+// Navbar brand
+//
+// Used for brand, project, or site names.
+
+.navbar-brand {
+  display: inline-block;
+  padding-top: $navbar-brand-padding-y;
+  padding-bottom: $navbar-brand-padding-y;
+  margin-right: $navbar-padding-x;
+  @include font-size($navbar-brand-font-size);
+  line-height: inherit;
+  white-space: nowrap;
+
+  @include hover-focus() {
+    text-decoration: none;
+  }
+}
+
+
+// Navbar nav
+//
+// Custom navbar navigation (doesn't require `.nav`, but does make use of `.nav-link`).
+
+.navbar-nav {
+  display: flex;
+  flex-direction: column; // cannot use `inherit` to get the `.navbar`s value
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+
+  .nav-link {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .dropdown-menu {
+    position: static;
+    float: none;
+  }
+}
+
+
+// Navbar text
+//
+//
+
+.navbar-text {
+  display: inline-block;
+  padding-top: $nav-link-padding-y;
+  padding-bottom: $nav-link-padding-y;
+}
+
+
+// Responsive navbar
+//
+// Custom styles for responsive collapsing and toggling of navbar contents.
+// Powered by the collapse Bootstrap JavaScript plugin.
+
+// When collapsed, prevent the toggleable navbar contents from appearing in
+// the default flexbox row orientation. Requires the use of `flex-wrap: wrap`
+// on the `.navbar` parent.
+.navbar-collapse {
+  flex-basis: 100%;
+  flex-grow: 1;
+  // For always expanded or extra full navbars, ensure content aligns itself
+  // properly vertically. Can be easily overridden with flex utilities.
+  align-items: center;
+}
+
+// Button for toggling the navbar when in its collapsed state
+.navbar-toggler {
+  padding: $navbar-toggler-padding-y $navbar-toggler-padding-x;
+  @include font-size($navbar-toggler-font-size);
+  line-height: 1;
+  background-color: transparent; // remove default button style
+  border: $border-width solid transparent; // remove default button style
+  @include border-radius($navbar-toggler-border-radius);
+
+  @include hover-focus() {
+    text-decoration: none;
+  }
+}
+
+// Keep as a separate element so folks can easily override it with another icon
+// or image file as needed.
+.navbar-toggler-icon {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
+  content: "";
+  background: 50% / 100% 100% no-repeat;
+}
+
+.navbar-nav-scroll {
+  max-height: $navbar-nav-scroll-max-height;
+  overflow-y: auto;
+}
+
+// Generate series of `.navbar-expand-*` responsive classes for configuring
+// where your navbar collapses.
+.navbar-expand {
+  @each $breakpoint in map-keys($grid-breakpoints) {
+    $next: breakpoint-next($breakpoint, $grid-breakpoints);
+    $infix: breakpoint-infix($next, $grid-breakpoints);
+
+    &#{$infix} {
+      @include media-breakpoint-down($breakpoint) {
+        %container-navbar-expand-#{$breakpoint} {
+          padding-right: 0;
+          padding-left: 0;
+        }
+
+        > .container,
+        > .container-fluid {
+          @extend %container-navbar-expand-#{$breakpoint};
+        }
+
+        @each $size, $container-max-width in $container-max-widths {
+          > .container#{breakpoint-infix($size, $container-max-widths)} {
+            @extend %container-navbar-expand-#{$breakpoint};
+          }
+        }
+      }
+
+      @include media-breakpoint-up($next) {
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+
+        .navbar-nav {
+          flex-direction: row;
+
+          .dropdown-menu {
+            position: absolute;
+          }
+
+          .nav-link {
+            padding-right: $navbar-nav-link-padding-x;
+            padding-left: $navbar-nav-link-padding-x;
+          }
+        }
+
+        // For nesting containers, have to redeclare for alignment purposes
+        %container-nesting-#{$breakpoint} {
+          flex-wrap: nowrap;
+        }
+
+        > .container,
+        > .container-fluid {
+          @extend %container-nesting-#{$breakpoint};
+        }
+
+        @each $size, $container-max-width in $container-max-widths {
+          > .container#{breakpoint-infix($size, $container-max-widths)} {
+            @extend %container-nesting-#{$breakpoint};
+          }
+        }
+
+        .navbar-nav-scroll {
+          overflow: visible;
+        }
+
+        .navbar-collapse {
+          display: flex !important; // stylelint-disable-line declaration-no-important
+
+          // Changes flex-bases to auto because of an IE10 bug
+          flex-basis: auto;
+        }
+
+        .navbar-toggler {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+
+// Navbar themes
+//
+// Styles for switching between navbars with light or dark background.
+
+// Dark links against a light background
+.navbar-light {
+  .navbar-brand {
+    color: $navbar-light-brand-color;
+
+    @include hover-focus() {
+      color: $navbar-light-brand-hover-color;
+    }
+  }
+
+  .navbar-nav {
+    .nav-link {
+      color: $navbar-light-color;
+
+      @include hover-focus() {
+        color: $navbar-light-hover-color;
+      }
+
+      &.disabled {
+        color: $navbar-light-disabled-color;
+      }
+    }
+
+    .show > .nav-link,
+    .active > .nav-link,
+    .nav-link.show,
+    .nav-link.active {
+      color: $navbar-light-active-color;
+    }
+  }
+
+  .navbar-toggler {
+    color: $navbar-light-color;
+    border-color: $navbar-light-toggler-border-color;
+  }
+
+  .navbar-toggler-icon {
+    background-image: escape-svg($navbar-light-toggler-icon-bg);
+  }
+
+  .navbar-text {
+    color: $navbar-light-color;
+    a {
+      color: $navbar-light-active-color;
+
+      @include hover-focus() {
+        color: $navbar-light-active-color;
+      }
+    }
+  }
+}
+
+// White links against a dark background
+.navbar-dark {
+  .navbar-brand {
+    color: $navbar-dark-brand-color;
+
+    @include hover-focus() {
+      color: $navbar-dark-brand-hover-color;
+    }
+  }
+
+  .navbar-nav {
+    .nav-link {
+      color: $navbar-dark-color;
+
+      @include hover-focus() {
+        color: $navbar-dark-hover-color;
+      }
+
+      &.disabled {
+        color: $navbar-dark-disabled-color;
+      }
+    }
+
+    .show > .nav-link,
+    .active > .nav-link,
+    .nav-link.show,
+    .nav-link.active {
+      color: $navbar-dark-active-color;
+    }
+  }
+
+  .navbar-toggler {
+    color: $navbar-dark-color;
+    border-color: $navbar-dark-toggler-border-color;
+  }
+
+  .navbar-toggler-icon {
+    background-image: escape-svg($navbar-dark-toggler-icon-bg);
+  }
+
+  .navbar-text {
+    color: $navbar-dark-color;
+    a {
+      color: $navbar-dark-active-color;
+
+      @include hover-focus() {
+        color: $navbar-dark-active-color;
+      }
+    }
+  }
+}
+.bg-image{
+  background-image: url(/img/Home_bg.png);
+  background-size: contain;
+  
+}
+body{
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.bg-image{
+  background-image: url(/img/Home_bg.png);
+}
+
+.radious{
+  border-radius: 22px;
+  &:hover{
+    background: white;
+    border: 1px solid blue;
+    color: blue;
+  }
+  transition:color 0.3s ease,
+  background 0.3s ease,
+  color 0.3s ease;
+}
+.hov{
+  font-size: 18px;
+  color: #000;
+  &:hover{
+    color: blue;
+  }
+  transition: color 0.4s ease;
+}
+.hov1{
+  font-size: 18px;
+}
+.modern__life{
+  .b__r{
+    background: #e2eaed;
+    font-size: 18px;
+    color: #616368;
+    padding: 10px;
+    border-radius: 23px;
+    position: absolute;
+    top: 20px;
+    letter-spacing: 0;
+  }
+  .paragraph1{
+    font-size: 18px;
+    letter-spacing: 0;
+    color: #616368;
+    position: relative;
+    top: 25px;
+  }
+  letter-spacing: 2px;
+  color: #242f51;
+  position: absolute;
+  top: 240px;
+  font-size: 60px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.pad{
+  display: inline;
+  position: relative;
+}
+.bo__der{
+  border-radius: 29px;
+}
+  .radious1{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    letter-spacing: 0;
+    border-radius: 22px;
+    &:hover{
+      background: white;
+      border: 1px solid blue;
+      color: blue;
+    }
+    transition:color 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease;
+  }
+.img1__home_mobile{
+  z-index: 1;
+  width: 380px;
+  height:670px;
+  position: relative;
+  margin-left: 690px;
+  margin-top: 60px;
+  animation-name: anim;
+  animation-duration: 6s;
+  animation-timing-function: ease;
+  animation-fill-mode: backwards;
+  animation-iteration-count: infinite;
+}
+@keyframes anim{
+  0%{
+    transform: translate(0,10px);
+  }
+  50%{
+    transform: translate(0,-10px);
+  }
+  100%{
+    transform: translate(0,10px);
+  }
+}
+
+.bg-image{
+      background-repeat: no-repeat;
+      background-image: url(img/Home_bg.png);
+      padding-top: 10px;
+      width: 100%;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: bottom;
+      height: auto;
+      position: relative;
+}
+.navbar{
+    left: 0;
+    top: 0;
+    height: 70px;
+    line-height: 70px;
+    z-index: 1024;
+    width: 100%;
+    transition: 0.3s;
+}
+.round1{
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 700px;
+    animation-name: anim2;
+  animation-duration: 6s;
+  animation-timing-function: ease;
+  animation-fill-mode: backwards;
+  animation-iteration-count: infinite;
+
+}
+.round2{
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 200px;
+  left: 700px;
+    animation-name: anim2;
+  animation-duration: 6s;
+  animation-timing-function: ease;
+  animation-fill-mode: backwards;
+  animation-iteration-count: infinite;
+
+}
+.round3{
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 1300px;
+  top: 400px;
+    animation-name: anim2;
+  animation-duration: 6s;
+  animation-timing-function: ease;
+  animation-fill-mode: backwards;
+  animation-iteration-count: infinite;
+
+}
+.round_4{
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 100px;
+  top: 100px;
+    animation-name: anim2;
+  animation-duration: 6s;
+  animation-timing-function: ease;
+  animation-fill-mode: backwards;
+  animation-iteration-count: infinite;
+
+}
+.round_5{
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 600px;
+  left: 640px;
+    animation-name: anim2;
+  animation-duration: 6s;
+  animation-timing-function: ease;
+  animation: name duration timing-function delay iteration-count direction fill-mode;
+  animation-fill-mode: backwards;
+  animation-iteration-count: infinite;
+
+}
+@keyframes anim2{
+  0%{
+    transform: translate(10px, 10px);
+  }
+  50%{
+    transform: translate(-10px, 10px);
+  }
+  100%{
+    transform: translate(10px, 10px);
+  }
+ 
+}
+.f-s{
+  font-family: monospace;
+  font-size: 16px;
+}
+.img2{
+  width: 100px;
+}
+.home__bg{
+  margin-top: -240px;
+  width: 1420px;
+  height: 250px;
+}
+.radious2{
+  letter-spacing: 0;
+}
+.comp{
+  letter-spacing: 1px;
+}
+.awesome{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.increase{
+  color: grey;
+  font-size: 20px;
+}
+.img5{
+  width: 100px;
+  height: 100px;
+  margin-left: 30px;
+  position: relative;  
+  background-color: #ffecef;
+  border-radius: 50%;
+}
+.img6{
+  background-color: #f4f4ff;
+}
+.img7{
+  background-color: #e4ffee;
+}
+.fast{
+  position: relative;
+  left: 220px;
+  font-size: 33px;
+  color: #f55767;
+  top: -120px;
+}
+.text1{
+  font-size: 20px;
+  position: relative;
+  left: 220px;
+  top: -110px;
+}
+.p-a1{
+  position: relative;
+  left: -20px;
+}
+.p-a2{
+  position: relative;
+  top: -140px;
+  left: -20px;
+}
+.p-a3{
+  position: relative;
+  top: -280px;
+  left: -20px;
+}
+.smart{
+  font-size: 34px;
+  letter-spacing: 1px;
+  width: 500px;
+  border-right: 1px solid grey;
+  color: #242f51;
+}
+.rise{
+  color: grey;
+  position: relative;
+  top: 35px;
+  font-size: 19px;
+  left: 30px;
+}
+.p-s{
+  margin-top: -200px;
+}
+.images3{
+  padding: 15px;
+  width: 90px;
+  height: 90px;
+  background-color: #ffecef;
+}
+.auto{
+  color: #f55767;
+}
+.net{
+  color: #242f51;
+}
+.big{
+ color: #40975f;
+}
+.get__blood{
+  font-size: 20px;
+  color: grey;
+}
+.mtop{
+  margin-top: 100px;
+}
+.mtop1{
+  margin-top: 260px;
+}
+.f-s{
+  padding-left: 140px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  letter-spacing: 0;
+  font-size: 45px;
+}
+.f-s2{
+  padding-left: 140px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  letter-spacing: 0;
+  font-size: 19px;
+  padding-top: 20px;
+  color: grey;
+}
+.border-bottom{
+  padding-bottom: 70px;
+  border-bottom: 1px solid grey;
+}
+.why{
+  font-size: 44px;
+}
+
+.pure1{
+  color: #ffecef;
+}
+.photo{
+  border-radius: 50%;
+  width: 80px;
+  padding: 12px;
+  background-color: #ffecef;
+}
+.photo2{
+  background-color:#eaf9ff;
+}
+.photo3{
+  background-color:#fff6d3;
+}
+.box1{
+  margin-left: -90px;
+}
+.box2{
+  margin-left: -90px;
+}
+.box3{
+  margin-left: -90px;
+}
+.parag{
+  width: 250px;
+}
+h4{
+  margin-left: -70px;
+}
+.app1{
+  margin-left: -120px;
+}
+.app3{
+  margin-left: -100px;
+}
+.parag2{
+  font-size: 20px;
+}
+.photo7
+{
+  border-radius: 50%;
+  width: 100px;
+  display: flex;
+  padding: 20px;
+ background-color: #ffecef;
+}.appimg_bg{
+  padding: 12px;
+  background: #ffecef;
+  width:80px;
+  border-radius: 50%;
+}
+.mt_15{
+  color: #242f51;
+}
+.appimg_bg2{
+  background-color: #e4ffee;
+}
+.move1{
+top: -600px;
+  position: relative;
+  margin-left: 600px;
+  width: 600px;
+  height:700px;
+}
+.radious4{
+  font-family: monospace;
+  top: 280px;
+  left: -580px;
+  position: relative;
+  width: 140px;
+  height: 40px;
+  border-radius: 22px;
+  &:hover{
+    background: white;
+    border: 1px solid blue;
+    color: blue;
+  }
+  transition:color 0.3s ease,
+  background 0.3s ease,
+  color 0.3s ease;
+}
+.move5{
+  margin-top: -500px;
+}
+.p-a{
+  position: absolute;
+}
+.prices1{
+  width: 300px;
+}
+.prices2{
+  width: 300px;
+}
+
+.color1{
+  background-color: #f6f8fa;
+}
+.move6{
+  background-color: #f6f8fa;
+  margin-left: 400px;
+}
+.prices3{
+  background-color: #f6f8fa;
+
+  margin-left: 800px;
+}
+.nav1{
+  display: flex;
+  justify-content: center;
+}
+
+.color2{
+  border-top-right-radius: 12px;
+  border-top-left-radius:12px;
+  background-color: #f6f8fa;
+  height: 260px;
+  position: relative;
+  padding-top: 50px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.color3{
+  border-top-right-radius: 12px;
+  border-top-left-radius:12px;
+  background-color: #f6f8fa;
+  height: 260px;
+  position: relative;
+  padding-top: 50px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+}
+
+.color4{
+  border-top-right-radius: 12px;
+  border-top-left-radius:12px;
+  background-color: #f6f8fa;
+  height: 260px;
+  position: relative;
+  padding-top: 50px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+}
+
+.color-text{
+  color: #242f51;
+}
+li{
+  list-style-type: none;
+}
+.pl-none{
+  margin-left: -30px;
+  font-weight: 700;
+}
+.btn1{
+  border-radius: 24px;
+}
+.mt{
+  margin-top: 28px;
+  padding-bottom: 20px;
+}
+.borders{
+  box-shadow: 1px 1px 19px 1px rgb(243, 240, 240);
+}
+.border2{
+  border-bottom: px solid white;
+}
+.lin1{
+  width: 200px;
+  height: 40px;
+}
+.item1{
+  width: 200px;
+  height: 40px;
+  border-radius: 23px;
+}
+.getbtn {
+  display: inline-flex;
+  border: 1px solid #ebebeb;
+  border-radius: 35px;
+  padding: 2px;
+  align-items: center;
+  justify-content: center;
+  width: 340px;
+  display: flex;
+  justify-content: space-between;
+  height: 56px;
+}
+.getbtn a.active {
+  border-radius: 35px;
+  background: #2563ff;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: capitalize;
+  transition: 0.3s;
+  min-width: 170px;
+  height: 50px;
+  color: #fff;
+  display: inline-block;
+  display: flex;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-items: center;
+  border: 2px;
+}
+.month{
+  margin-left: 30px;
+}
+.year{
+  margin-right: 30px;
+}
+.lin{
+  margin-top: -18px;
+  display: flex;
+  justify-content: center;
+  font-weight: 700;
+}
+// .month .active{
+//    margin-left: -10px;
+// }
+// .year .active{
+//   margin-right: -10px;
+// }
+.active{
+  justify-content: center;
+}
+.font{
+  font-size: 75px;
+  font-weight: 700;
+  padding-top: 40px;
+  margin-top: 120px;
+}
+.borders{
+  border-radius: 12px;
+}
+.borders4{
+  border: 1px solid rgb(206, 204, 204);
+}
+.move9{
+  position: relative;
+  top: -20px;
+}
+.img12{
+  width: 700px;
+  height: 450px;
+  margin-top: 120px;
+}
+.font2{
+  font-size: 44px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.bordercha{
+  border-bottom: 1px solid rgb(219, 215, 215);
+}
+.move8{
+  margin-left: 20px;
+  margin-top: 90px;
+  font-family: 'Poppins', sans-serif;
+  color: #242f51;
+}
+.consume{
+  margin-top: 20px;
+  margin-left: 20px;
+}
+.fa-star{
+  color: #ffcc00;
+  padding-left: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.friendcustomize_box{
+  margin-left: 20px;
+}
+.meet_txt{
+  margin-left: 25px;
+}
+.zolton{
+ margin-left:1px;
+}
+.sub_title{
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.devise2{
+  margin-top: 40px;
+  margin-left: -100px;
+}
+.FAQ{
+  color: #242f51;
+}
+.active{
+}
+.color9{
+  background-color: rgb(239, 239, 239);
+}
+.main{
+color: #242f51;
+}
+.img13{
+  margin-left: -60px;
+   width: 680px;
+   height: 300px;
+}
+.main2{
+  background-color: #09142e;
+}
+.footer{
+  height: 400px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.hov2{
+  color: white;
+  &:hover{
+    color: #2563ff;
+  }
+}
+.fab{
+  font-size: 2em;
+  padding-left: 18px;
+  padding-top: 20px;
+  color: #273043;
+  &:hover{
+    color: white;
+  }
+  transition: color 0.2s ease;
+}
+.mtop3{
+  position: relative;
+  top: -50px;
+  color: #616368;
+}
+.carousel-control-next{
+  height: 100px;
+  width: 40px;
+  border-radius: 50%;
+  margin-top: 280px;
+  position: relative;
+}
+.carousel-control-prev{
+  height: 100px;
+  width: 40px;
+  border-radius: 50%;
+  margin-top: 280px;
+  margin-left: 460px;
+  position: relative;
+}
+.fa-arrow-right{
+  font-size: 22px;
+}
+.fa-arrow-left{
+  font-size: 22px;
+}
+.body{
+  transition: body 1s ease;
+}
+.img-icon{
+  color: #feaa25;
+  background-color: #feaa25;
+  padding: 11px;
+  border-radius: 50%;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.container{
+  margin: 10px auto;
+}
+.navbar-expand-lg{
+position: relative;
+margin-top: -40px;
+}
